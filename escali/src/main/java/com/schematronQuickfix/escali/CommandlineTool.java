@@ -19,6 +19,8 @@ import com.github.oxygenPlugins.common.xml.xslt.SaxonUtils;
 import com.schematronQuickfix.escali.control.report._QuickFix;
 import com.schematronQuickfix.escali.control.report._Report;
 import net.sf.saxon.Configuration;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.om.ValueRepresentation;
 import net.sf.saxon.s9api.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -84,99 +86,33 @@ public class CommandlineTool {
 		}
 	}
 	
-	private void fix() throws XPathExpressionException, IOException{
-//		NodeList fixNodes = this.report.getFixes();
-//		for (int i = 0; i < fixNodes.getLength(); i++) {
-//			System.out.println((i + 1) + "\t" + SVRLReport.XPR.getString("sqf:description/svrl:text", fixNodes.item(i)));
-//		}
-//		System.out.println("0\texit");
-//		System.out.print("Choose the QuickFix: ");
-//		int sel = Integer.parseInt(cmdInput.next()) - 1;
-//		if(sel == - 1){
-//			System.exit(0);
-//		}
-//
-
-
-
-//		NodeList fixNodes = this.report.getSVRL().
+	private void fix() throws XPathExpressionException, IOException, SAXException {
 		final HashMap<String, TextSource> fixParts = this.report.getFixParts();
 		Stack<String> fixIds = new Stack<>();
 
-		int i = 1;
+		Processor saxonProcessor = new Processor(false);
+		XPathCompiler xPathCompiler = saxonProcessor.newXPathCompiler();
+		net.sf.saxon.s9api.DocumentBuilder saxonDocumentBuilder = saxonProcessor.newDocumentBuilder();
+		javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder;
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+
+		final Document svrlDocument;
+        try {
+			xmlParsersDocumentBuilder = factory.newDocumentBuilder();
+            svrlDocument = parseTextSource(report.getSVRL(), xmlParsersDocumentBuilder);
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
+		final XdmNode svrlDocumentXdmNode = saxonDocumentBuilder.wrap(svrlDocument);
+
+        int i = 1;
 		for (TextSource fixPart : fixParts.values()) {
-//			System.out.println(i + "\t" + SVRLReport.XPR.getString("sqf:description/sqf:title", ));
-			final String fixPartXmlString = fixPart.toString();
-//			fixPartXmlString;
-
-
-/*			final XPathReader xPathReader = new XPathReader();
-			final Document document = xPathReader.readAsNodeSet(fixPartXmlString);
-			document.get*/
-
-//			final XPathReader xpr = SVRLReport.XPR;
-			final _Report report1 = report.getReport();
-			final TextSource svrl = report.getSVRL();
-
-			final XPathReader xPathReader = new XPathReader();
-			final Document fixPartDocument;
-
-            try {
-//                document = xPathReader.readAsNodeSet(fixPartXmlString);
-
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setNamespaceAware(true);
-				Document doc = null;
-				javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
-				final ByteArrayInputStream inputStream = new ByteArrayInputStream(fixPartXmlString.getBytes("UTF-8"));
-				fixPartDocument = builder.parse(inputStream);
-            } catch (ParserConfigurationException e) {
-                throw new RuntimeException(e);
-            } catch (SAXException e) {
-                throw new RuntimeException(e);
-            }
-
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setNamespaceAware(true);
-
-			final String id = fixPartDocument.getDocumentElement().getAttribute("id");
-			fixIds.add(id);
-
-			final Document svrlDocument;
-			javax.xml.parsers.DocumentBuilder builder;
-			try {
-//                document = xPathReader.readAsNodeSet(fixPartXmlString);
-                builder = factory.newDocumentBuilder();
-                final ByteArrayInputStream inputStream = new ByteArrayInputStream(svrl.toString().getBytes("UTF-8"));
-				svrlDocument = builder.parse(inputStream);
-			} catch (ParserConfigurationException e) {
-                throw new RuntimeException(e);
-            } catch (SAXException e) {
-                throw new RuntimeException(e);
-            }
-
-			Processor saxonProcessor = new Processor(false);
-
-			net.sf.saxon.s9api.DocumentBuilder saxonDocumentBuilder = saxonProcessor.newDocumentBuilder();
-			final XdmNode svrlDocumentXdmNode = saxonDocumentBuilder.wrap(svrlDocument);
-
-			XPathCompiler xPathCompiler = saxonProcessor.newXPathCompiler();
-			final XdmItem fixTitle;
-			final String sqfPredicate = "[namespace-uri() eq 'http://www.schematron-quickfix.com/validator/process']";
-			final String xPath = "//*:fix" + sqfPredicate +
-								 "[@id eq '" + id + "']" +
-								 "/*:description" + sqfPredicate +
-								 "/*:title" + sqfPredicate;
-            try {
-                fixTitle = xPathCompiler.evaluateSingle(xPath, svrlDocumentXdmNode);
-            } catch (SaxonApiException e) {
-                throw new RuntimeException(e);
-            }
-
-			final String title = fixTitle.getStringValue();
-
-			System.out.println(i + "\t" + title);
-
+			final String fixId = getFixIdFromFixPart(fixPart, xmlParsersDocumentBuilder);
+			printFixPart(String.valueOf(i), fixId, svrlDocumentXdmNode, xPathCompiler);
+			fixIds.add(fixId);
 			i++;
 		}
 
@@ -187,10 +123,9 @@ public class CommandlineTool {
 			System.exit(0);
 		}
 
-//		Node fix = fixNodes.item(sel);
 		String fixId  = fixIds.toArray()[sel].toString();
 		String fixUri = fixParts.keySet().toArray()[sel].toString();
-//		final TextSource fixPart = fixParts.get(fixUri);
+
 		System.out.println("ID  of the quickFix: " + fixId);
 		System.out.println("URI of the quickFix: " + fixUri);
 
@@ -200,12 +135,41 @@ public class CommandlineTool {
         } catch (XSLTErrorListener e) {
             throw new RuntimeException(e);
         }
-//		TextSource result = escali.executeFix(fixId);
-//		TextSource result = escali.executeFix(fixPart, TextSource.readTextFile(this.input));
-//		TextSource result = escali.executeFix(new String[]{SVRLReport.XPR.getString("@id", fixUri)});
+
 		TextSource.write(this.outFile, executedFix.get(0));
 	}
-	
+
+	static String getFixIdFromFixPart(TextSource fixPart, javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder) throws IOException, SAXException {
+		final Document fixPartDocument = parseTextSource(fixPart, xmlParsersDocumentBuilder);
+		return fixPartDocument.getDocumentElement().getAttribute("id");
+	}
+
+	static void printFixPart(String prefix, String fixId, XdmNode svrlDocumentXdmNode, XPathCompiler xPathCompiler){
+		final XdmNode fixTitle;
+		final String sqfPredicate = "[namespace-uri() eq 'http://www.schematron-quickfix.com/validator/process']";
+		final String xPath = "//*:fix" + sqfPredicate +
+				"[@id eq '" + fixId + "']" +
+				"/*:description" + sqfPredicate +
+				"/*:title" + sqfPredicate;
+		try {
+			fixTitle = (XdmNode) xPathCompiler.evaluateSingle(xPath, svrlDocumentXdmNode);
+		} catch (SaxonApiException e) {
+			throw new RuntimeException(e);
+		}
+
+		final String title = fixTitle.getStringValue();
+		final XdmNode reportNode = fixTitle.getParent().getParent().getParent();
+		final String location = reportNode.getAttributeValue(new QName("location"));
+
+		System.out.println(prefix + "\t" + title + "\t" + location);
+	}
+
+	static Document parseTextSource(TextSource textSource, javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder) throws IOException, SAXException {
+		final String textSourceString = textSource.toString();
+		final ByteArrayInputStream inputStream = new ByteArrayInputStream(textSourceString.getBytes("UTF-8"));
+        return xmlParsersDocumentBuilder.parse(inputStream);
+    }
+
 	private String printValidationReport() {
 		return report.getFormatetReport(SVRLReport.TEXT_FORMAT).toString();
 	}

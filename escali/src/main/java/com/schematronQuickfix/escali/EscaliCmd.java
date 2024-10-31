@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.cli.CommandLine;
@@ -75,7 +76,9 @@ public class EscaliCmd {
 		String[] vValues = EscaliOptions.getOptionValues(cmd, EscaliOptions.VALIDATE_OPTION);
 		File schema = new File(vValues[1]);
 		File instance = new File(vValues[0]); 
-		Config config = ConfigFactory.createDefaultConfig();
+//		Config config = ConfigFactory.createDefaultConfig();
+		final StreamSource streamSource = new StreamSource(new File("D:\\Projects\\Other\\Escali\\escali-package\\escali\\src\\main\\resources\\config.xml"));
+		Config config = ConfigFactory.createConfig(streamSource);
 		if(EscaliOptions.hasOption(cmd, EscaliOptions.PHASE_OPTION)){
 			config.setPhase(EscaliOptions.getOptionValue(cmd, EscaliOptions.PHASE_OPTION));
 		}
@@ -83,6 +86,7 @@ public class EscaliCmd {
 		
 		
 		SVRLReport report = cmdValidation.validate(instance);
+		viewReport(report);
 		if(EscaliOptions.hasOption(cmd, EscaliOptions.VALIDATE_OPTION)){
 			Interactive menu = new Interactive(report);
 			menu.process();
