@@ -145,7 +145,6 @@ public class Escali {
 		} else {
 			fixes = new _QuickFix[]{};
 		}
-//		escali.executeFix(fixes, this.report, this.report.getInput());
 		return this.executeFix(fixes, TextSource.readTextFile(this.report.getSourceFile()));
 	}
 

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 
+import com.schematronQuickfix.escali.control.report.*;
 import org.xml.sax.SAXException;
 
 import com.github.oxygenPlugins.common.process.exceptions.CancelException;
@@ -19,11 +20,6 @@ import com.github.oxygenPlugins.common.xml.exceptions.XSLTErrorListener;
 import com.schematronQuickfix.escali.control.Config;
 import com.schematronQuickfix.escali.control.Escali;
 import com.schematronQuickfix.escali.control.SVRLReport;
-import com.schematronQuickfix.escali.control.report.MessageGroup;
-import com.schematronQuickfix.escali.control.report._MessageGroup;
-import com.schematronQuickfix.escali.control.report._QuickFix;
-import com.schematronQuickfix.escali.control.report._SVRLMessage;
-import com.schematronQuickfix.escali.control.report._UserEntry;
 import com.schematronQuickfix.escali.resources.EscaliArchiveResources;
 
 public class Fixing {
@@ -96,18 +92,16 @@ public class Fixing {
 		return results;
 	}
 
-	// public void executeFix(String fixId) throws XSLTErrorListener,
-	// IOException {
-	//
-	//
-	//// _Report reportObj = this.report.getReport();
-	//// _ModelNode node = reportObj.getChildById(fixId);
-	//// _QuickFix[] fixes;
-	//// if(node != null && node instanceof _QuickFix){
-	//// fixes = new _QuickFix[]{(_QuickFix) node};
-	//// } else {
-	//// fixes = new _QuickFix[]{};
-	//// }
-	//// escali.executeFix(fixes, this.report, this.report.getInput());
-	// }
+//	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
+//		_Report reportObj = this.report.getReport();
+//		_ModelNode node = reportObj.getChildById(fixId);
+//		_QuickFix[] fixes;
+//		if (node != null && node instanceof _QuickFix) {
+//			fixes = new _QuickFix[]{(_QuickFix) node};
+//		} else {
+//			fixes = new _QuickFix[]{};
+//		}
+////		escali.executeFix(fixes, this.report, this.report.getInput());
+//		escali.executeFix(fixes, this.report.getSVRL());
+//	}
 }

@@ -42,17 +42,17 @@ public class Validation {
 		return this.escali.validate(source, DefaultProcessLoger.getDefaultProccessLogger());
 	}
 	
-	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
-//		_Report reportObj = this.escali.getReport().getReport();
-//		_ModelNode node = reportObj.getChildById(fixId);
-//		_QuickFix[] fixes;
-//		if(node != null && node instanceof _QuickFix){
-//			fixes = new _QuickFix[]{(_QuickFix) node};
-//		} else {
-//			fixes = new _QuickFix[]{};
-//		}
-//		escali.executeFix(fixes);
-	}
+/*	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
+		_Report reportObj = this.escali.getReport().getReport();
+		_ModelNode node = reportObj.getChildById(fixId);
+		_QuickFix[] fixes;
+		if(node != null && node instanceof _QuickFix){
+			fixes = new _QuickFix[]{(_QuickFix) node};
+		} else {
+			fixes = new _QuickFix[]{};
+		}
+		escali.executeFix(fixes);
+	}*/
 	
 	public void interactive() {
 		SVRLReport report = this.escali.getReport();
