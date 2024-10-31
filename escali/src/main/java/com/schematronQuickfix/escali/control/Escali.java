@@ -9,6 +9,8 @@ import java.util.HashMap;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 
+import com.schematronQuickfix.escali.control.report._ModelNode;
+import com.schematronQuickfix.escali.control.report._Report;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -133,6 +135,19 @@ public class Escali {
 	// public TextSource validateText() {
 	// return this.report.getFormatetReport(SVRLReport.TEXT_FORMAT);
 	// }
+
+	public ArrayList<TextSource> executeFix(String fixId) throws XSLTErrorListener, IOException {
+		_Report reportObj = this.report.getReport();
+		_ModelNode node = reportObj.getChildById(fixId);
+		_QuickFix[] fixes;
+		if (node != null && node instanceof _QuickFix) {
+			fixes = new _QuickFix[]{(_QuickFix) node};
+		} else {
+			fixes = new _QuickFix[]{};
+		}
+//		escali.executeFix(fixes, this.report, this.report.getInput());
+		return this.executeFix(fixes, TextSource.readTextFile(this.report.getSourceFile()));
+	}
 
 	public ArrayList<TextSource> executeFix(_QuickFix[] fixIds, TextSource svrlSource,
 			HashMap<String, TextSource> fixParts, TextSource input) throws XSLTErrorListener {

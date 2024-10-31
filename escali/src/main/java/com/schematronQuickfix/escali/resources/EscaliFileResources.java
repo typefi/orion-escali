@@ -35,7 +35,7 @@ public class EscaliFileResources implements EscaliResourcesInterface {
 	
 	public EscaliFileResources(File baseDir) {
 		this.baseFolder = baseDir;
-		this.escaliFolder = new File(baseFolder, "xml/xsl");
+		this.escaliFolder = new File(baseFolder, "xsl");
 		this.defaultTempFolder = new File(baseFolder, "../temp");
 		this.valFolder = new File(escaliFolder, "02_validator");
 		this.extractorFolder = new File(escaliFolder, "03_extractor");
