@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -218,46 +219,31 @@ public class CommandlineTool {
 	 * @throws XMLStreamException 
 	 */
 	public static void main(String[] args) throws TransformerException, IOException, SAXException, XPathExpressionException, ParserConfigurationException, URISyntaxException, XMLStreamException, CancelException, XSLTErrorListener {
-/*		try {
+		try {
 			cmdParser.parseCommandline(args);
 		} catch (ParseException e) {
 			System.err.println(e.getLocalizedMessage());
 			cmdParser.getHelp();
 		}
-		
+
 		if(cmdParser.cmd.hasOption('v')){
-			File input = new File(cmdParser.cmd.getOptionValues('v')[0]);
-			File schema = new File(cmdParser.cmd.getOptionValues('v')[1]);
+            File input  = new File(cmdParser.cmd.getOptionValues('v')[0]);
+            File schema = new File(cmdParser.cmd.getOptionValues('v')[1]);
+			File out    = new File(cmdParser.cmd.getOptionValues('o')[0]);
+
+			System.out.println("Starting Escali Schematron commandline tool v" + CommandlineTool.VERSION);
 			System.out.println(input + " | " + schema);
-			try {
-				Validation val = new Validation(schema, new MuteProcessLoger());
-				val.validate(input);
-			} catch (XSLTErrorListener e) {
-				e.printStackTrace();
-			} catch (CancelException e) {
-				e.printStackTrace();
-			}
-			
-			
+
+			final URI jarFileUri = CommandlineTool.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+			final File baseDir = new File(jarFileUri);
+			final Source configSource = new EscaliFileResources(baseDir).getConfig();
+			final File configFile = new File(configSource.getSystemId());
+
+			CommandlineTool cmdt = new CommandlineTool();
+			cmdt.start(input, schema, out, configFile);
 		} else {
 			System.out.println("no command!");
 			cmdParser.getHelp();
-		}*/
-
-		System.out.println("Starting Escali Schematron commandline tool v" + CommandlineTool.VERSION);
-
-		File input = new File("d:\\Projects\\Other\\Escali\\sqf\\samples\\add-id\\add-id.dita");
-		File schema = new File("d:\\Projects\\Other\\Escali\\sqf\\samples\\add-id\\add-id.sch");
-		File out = new File("d:\\result.xml");
-//		final File baseDir = new File("d:/Projects/Other/Escali/escali-package/escali/src/main/");
-/*		Source configSource = new EscaliFileResources(baseDir).getConfig();
-		File configFile = configSource.getSystemId().;*/
-		File config = new File("D:/Projects/Other/Escali/escali-package/escali/src/main/resources/config.xml");
-//		File svrl = new File("temp/java_temp.svrl");
-		CommandlineTool cmdt = new CommandlineTool();
-		cmdt.start(input, schema, out, config);
-
-//		Validate val = new Validate(schema);
-//		System.out.println(val.validateSVRL(input));
+		}
 	}
 }
