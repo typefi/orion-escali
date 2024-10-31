@@ -10,8 +10,8 @@
 	<modules>
 		<module>xsm</module>
 		<module>escali</module>
-<!--	    <module>escaliWeb</module>-->
-<!--	    <module>escaliGuiComponents</module>-->
+	    <module>escaliWeb</module>
+	    <module>escaliGuiComponents</module>
 <!--	    <module>escaliOxygen</module>-->
 	</modules>
     <properties>
