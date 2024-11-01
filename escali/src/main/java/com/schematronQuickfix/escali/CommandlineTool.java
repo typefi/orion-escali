@@ -1,5 +1,24 @@
 package com.schematronQuickfix.escali;
 
+import com.github.oxygenPlugins.common.process.exceptions.CancelException;
+import com.github.oxygenPlugins.common.process.log.DefaultProcessLoger;
+import com.github.oxygenPlugins.common.text.TextSource;
+import com.github.oxygenPlugins.common.xml.exceptions.XSLTErrorListener;
+import com.schematronQuickfix.escali.cmdInterface.Menus;
+import com.schematronQuickfix.escali.control.Escali;
+import com.schematronQuickfix.escali.control.SVRLReport;
+import com.schematronQuickfix.escali.resources.EscaliFileResources;
+import net.sf.saxon.s9api.*;
+import org.apache.commons.cli.*;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,44 +27,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.Stack;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-
-import com.github.oxygenPlugins.common.xml.xpath.XPathReader;
-import com.github.oxygenPlugins.common.xml.xslt.SaxonUtils;
-import com.schematronQuickfix.escali.control.report._QuickFix;
-import com.schematronQuickfix.escali.control.report._Report;
-import net.sf.saxon.Configuration;
-import net.sf.saxon.om.Item;
-import net.sf.saxon.om.ValueRepresentation;
-import net.sf.saxon.s9api.*;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import com.github.oxygenPlugins.common.process.exceptions.CancelException;
-import com.github.oxygenPlugins.common.process.log.DefaultProcessLoger;
-import com.github.oxygenPlugins.common.process.log.MuteProcessLoger;
-import com.github.oxygenPlugins.common.text.TextSource;
-import com.github.oxygenPlugins.common.xml.exceptions.XSLTErrorListener;
-import com.schematronQuickfix.escali.cmdInterface.Menus;
-import com.schematronQuickfix.escali.cmdInterface.Validation;
-import com.schematronQuickfix.escali.control.Escali;
-import com.schematronQuickfix.escali.control.SVRLReport;
-import com.schematronQuickfix.escali.resources.EscaliFileResources;
-
-import static java.nio.file.StandardCopyOption.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class CommandlineTool {
 	
