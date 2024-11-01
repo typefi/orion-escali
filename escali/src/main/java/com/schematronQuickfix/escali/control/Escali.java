@@ -3,8 +3,7 @@ package com.schematronQuickfix.escali.control;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
@@ -146,6 +145,26 @@ public class Escali {
 			fixes = new _QuickFix[]{};
 		}
 		return this.executeFix(fixes, source);
+	}
+
+	public ArrayList<TextSource> executeFix(List<String> fixIds, TextSource source) throws XSLTErrorListener, IOException {
+		_Report reportObj = this.report.getReport();
+
+		Stack<_QuickFix> fixesStack = new Stack<>();
+
+		for (String fixId : fixIds){
+			_ModelNode node = reportObj.getChildById(fixId);
+
+			if (node != null && node instanceof _QuickFix) {
+				_QuickFix fix = (_QuickFix) node;
+				fixesStack.push(fix);
+			}
+		}
+
+		Collections.reverse(fixesStack);
+		final _QuickFix[] fixesArray = fixesStack.toArray(new _QuickFix[0]);
+
+		return this.executeFix(fixesArray, source);
 	}
 
 	public ArrayList<TextSource> executeFix(_QuickFix[] fixIds, TextSource svrlSource,

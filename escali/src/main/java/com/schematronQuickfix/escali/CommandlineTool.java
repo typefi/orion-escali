@@ -27,10 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -72,15 +69,37 @@ public class CommandlineTool {
 			System.out.println("Validating again...");
 			validate();
 		} else if (sel.equals("2")){
-			fix();
+			fix(false);
 		} else if (sel.equals("3")){
+			fix(true);
+		} else if (sel.equals("4")){
 //			System.out.println(outFile.getAbsolutePath());
 			TextSource.write(outFile, report.getSVRL());
 			System.exit(0);
 		}
 	}
 	
-	private void fix() throws XPathExpressionException, IOException, SAXException {
+	private void fix(boolean fixAll) throws IOException, SAXException {
+		final List<String> fixIds = getFixIds();
+
+		final List<String> selectedFixIds = fixAll ? fixIds : Collections.singletonList(queryFixId(fixIds));
+
+        ArrayList<TextSource> executedFix = null;
+        try {
+            executedFix = escali.executeFix(selectedFixIds, this.currentTextSource);
+        } catch (XSLTErrorListener e) {
+            throw new RuntimeException(e);
+        }
+
+		reAttachCurrentSource(executedFix.get(0));
+	}
+
+	static String getFixIdFromFixPart(TextSource fixPart, javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder) throws IOException, SAXException {
+		final Document fixPartDocument = parseTextSource(fixPart, xmlParsersDocumentBuilder);
+		return fixPartDocument.getDocumentElement().getAttribute("id");
+	}
+
+	List<String> getFixIds() throws IOException, SAXException {
 		final HashMap<String, TextSource> fixParts = this.report.getFixParts();
 		Stack<String> fixIds = new Stack<>();
 
@@ -110,6 +129,12 @@ public class CommandlineTool {
 			i++;
 		}
 
+		return fixIds;
+	}
+
+	String queryFixId(List<String> fixIds) {
+		final HashMap<String, TextSource> fixParts = this.report.getFixParts();
+
 		System.out.println("0\texit");
 		System.out.print("Choose the QuickFix: ");
 		int sel = Integer.parseInt(cmdInput.next()) - 1;
@@ -123,15 +148,11 @@ public class CommandlineTool {
 		System.out.println("ID  of the quickFix: " + fixId);
 		System.out.println("URI of the quickFix: " + fixUri);
 
-        ArrayList<TextSource> executedFix = null;
-        try {
-            executedFix = escali.executeFix(fixId, this.currentTextSource);
-        } catch (XSLTErrorListener e) {
-            throw new RuntimeException(e);
-        }
+		return fixId;
+	}
 
-		// Todo: reimplement without saving to disk
-		final TextSource fixedTextSource = executedFix.get(0);
+	// Todo: reimplement without saving to disk
+	void reAttachCurrentSource(TextSource fixedTextSource) throws IOException {
 		TextSource.write(this.outFile, fixedTextSource);
 
 		final File tempFolder = escali.getConfig().getTempFolder().getCanonicalFile();
@@ -144,11 +165,6 @@ public class CommandlineTool {
 		tempFile.deleteOnExit();
 		Files.copy(this.outFile.toPath(), tempFile.toPath(), REPLACE_EXISTING);
 		this.currentTextSource = TextSource.readTextFile(tempFile);
-	}
-
-	static String getFixIdFromFixPart(TextSource fixPart, javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder) throws IOException, SAXException {
-		final Document fixPartDocument = parseTextSource(fixPart, xmlParsersDocumentBuilder);
-		return fixPartDocument.getDocumentElement().getAttribute("id");
 	}
 
 	static void printFixPart(String prefix, String fixId, XdmNode svrlDocumentXdmNode, XPathCompiler xPathCompiler){
