@@ -16,6 +16,7 @@ import com.schematronQuickfix.escali.resources.EscaliResourcesInterface;
 
 public class Validator {
 	private TextSource svrl;
+	private TextSource validator;
 
 	private XSLTPipe precompilerPipe;
 	private XSLTPipe compilerPipe;
@@ -54,11 +55,11 @@ public class Validator {
 			ProcessLoger loger) throws XSLTErrorListener, FileNotFoundException {
 		this.schema = schema;
 		loger.log("Create validator");
-		TextSource validator = compilerPipe.pipeMain(schema,
-				config.createCompilerParams());
-		loger.log("Implement validator");
-		createValidatorPipe(validator);
 
+        this.validator = compilerPipe.pipeMain(schema,
+                config.createCompilerParams());
+        loger.log("Implement validator");
+		createValidatorPipe(this.validator);
 	}
 
 	private void createValidatorPipe(TextSource validator1)
@@ -66,16 +67,15 @@ public class Validator {
 		this.validatorPipe = new XSLTPipe("Escali validate");
 		validatorPipe.addStep(validator1);
 		validatorPipe.addStep(resource.getValidator());
-
 	}
 
 	protected void validateInstance(TextSource xml,
-			ArrayList<Parameter> params, ProcessLoger logger) {
+			ArrayList<Parameter> params, ProcessLoger logger) throws FileNotFoundException, XSLTErrorListener {
+		createValidatorPipe(this.validator);
 		ArrayList<TextSource> pipeMain = validatorPipe.pipeAll(xml, params, logger);
 		this.svrl = pipeMain.get(0);
 		pipeMain.remove(0);
 		this.fixParts = new ArrayList<TextSource>(pipeMain);
-		
 	}
 
 	protected TextSource getSvrl() {

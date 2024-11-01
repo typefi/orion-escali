@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,12 +45,15 @@ import com.schematronQuickfix.escali.control.Escali;
 import com.schematronQuickfix.escali.control.SVRLReport;
 import com.schematronQuickfix.escali.resources.EscaliFileResources;
 
+import static java.nio.file.StandardCopyOption.*;
+
 public class CommandlineTool {
 	
 	public final static double VERSION = 0.2;
 	
 	private Escali escali;
 	private File input;
+	private TextSource currentTextSource;
 	private File outFile;
 	private SVRLReport report;
 
@@ -58,16 +63,17 @@ public class CommandlineTool {
 	public void start(File input, File schema, File outFile, File config) throws XPathExpressionException, IOException, SAXException, XMLStreamException, XSLTErrorListener, URISyntaxException, CancelException{
 		this.input = input;
 		this.outFile = outFile;
+		this.currentTextSource = TextSource.readTextFile(this.input);
 		this.escali = new Escali();
 		this.escali.compileSchema(TextSource.readTextFile(schema), DefaultProcessLoger.getDefaultProccessLogger());
-		validate();
-		
-		
-		
+
+		while (true){
+			validate();
+		}
 	}
 	
 	private void validate() throws XPathExpressionException, FileNotFoundException, XSLTErrorListener, IOException, SAXException, URISyntaxException, XMLStreamException{
-		this.report = this.escali.validate(TextSource.readTextFile(this.input), DefaultProcessLoger.getDefaultProccessLogger());
+		this.report = this.escali.validate(this.currentTextSource, DefaultProcessLoger.getDefaultProccessLogger());
 		System.out.println(printValidationReport());
 		System.out.println(Menus.firstMenu);
 		System.out.print("Type your selection: ");
@@ -132,12 +138,25 @@ public class CommandlineTool {
 
         ArrayList<TextSource> executedFix = null;
         try {
-            executedFix = escali.executeFix(fixId);
+            executedFix = escali.executeFix(fixId, this.currentTextSource);
         } catch (XSLTErrorListener e) {
             throw new RuntimeException(e);
         }
 
-		TextSource.write(this.outFile, executedFix.get(0));
+		// Todo: reimplement without saving to disk
+		final TextSource fixedTextSource = executedFix.get(0);
+		TextSource.write(this.outFile, fixedTextSource);
+
+		final File tempFolder = escali.getConfig().getTempFolder().getCanonicalFile();
+		tempFolder.deleteOnExit();
+		tempFolder.mkdirs();
+		final Path tempFolderPath = tempFolder.toPath();
+
+		final Path tempFilePath = Files.createTempFile(tempFolderPath, "fixed-", ".xml");
+		final File tempFile = tempFilePath.toFile();
+		tempFile.deleteOnExit();
+		Files.copy(this.outFile.toPath(), tempFile.toPath(), REPLACE_EXISTING);
+		this.currentTextSource = TextSource.readTextFile(tempFile);
 	}
 
 	static String getFixIdFromFixPart(TextSource fixPart, javax.xml.parsers.DocumentBuilder xmlParsersDocumentBuilder) throws IOException, SAXException {

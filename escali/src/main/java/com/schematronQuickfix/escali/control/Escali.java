@@ -136,7 +136,7 @@ public class Escali {
 	// return this.report.getFormatetReport(SVRLReport.TEXT_FORMAT);
 	// }
 
-	public ArrayList<TextSource> executeFix(String fixId) throws XSLTErrorListener, IOException {
+	public ArrayList<TextSource> executeFix(String fixId, TextSource source) throws XSLTErrorListener, IOException {
 		_Report reportObj = this.report.getReport();
 		_ModelNode node = reportObj.getChildById(fixId);
 		_QuickFix[] fixes;
@@ -145,7 +145,7 @@ public class Escali {
 		} else {
 			fixes = new _QuickFix[]{};
 		}
-		return this.executeFix(fixes, TextSource.readTextFile(this.report.getSourceFile()));
+		return this.executeFix(fixes, source);
 	}
 
 	public ArrayList<TextSource> executeFix(_QuickFix[] fixIds, TextSource svrlSource,
