@@ -159,7 +159,7 @@
             <sqf:topLevel>
                 <xsl:attribute name="schema" select="/sch:schema/@es:uri"/>
                 <axsl:attribute name="instance" select="document-uri(/)"/>
-                <bxsl:stylesheet version="2.0">
+                <bxsl:stylesheet version="3.0">
                     <xsl:attribute name="xml:base" select="es:base-uri(.)"/>
                     <xsl:variable name="namespaceAliase" select="
                             for $na in /sch:schema/xsl:namespace-alias

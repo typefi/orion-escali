@@ -100,7 +100,7 @@
 
     <xsl:template match="sch:schema">
 
-        <axsl:stylesheet version="2.0">
+        <axsl:stylesheet version="3.0">
             <xsl:variable name="defaultNS" select="/sch:schema/es:default-namespace"/>
             <xsl:variable name="imports" select="/sch:schema/xsl:import"/>
             <xsl:variable name="firsts" select="
