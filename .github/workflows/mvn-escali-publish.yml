@@ -29,8 +29,6 @@ jobs:
         distribution: 'microsoft'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
     - name: 'Get Previous tag'
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@v1.3.0"
