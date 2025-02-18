@@ -8,4 +8,10 @@
   <artifactId>escaliWeb</artifactId>
   <name>Escali Web Editor</name>
   <description>Provides a JavaScript based Escali editor for the browser.</description>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/typefi/orion-escali</url>
+    </repository>
+  </distributionManagement>
 </project>
