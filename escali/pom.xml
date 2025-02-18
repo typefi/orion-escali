@@ -9,7 +9,12 @@
 	<artifactId>escali</artifactId>
 	<name>Escali Schematron Processor</name>
 	<description>The Escali Schematron Processor is able to validate Schematron Schema using the Escali Stylesheets. Based on the resulting report the processor is possible to execute QuickFixes, which was defind in SQF.</description>
-
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/typefi/orion-escali</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
