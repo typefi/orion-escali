@@ -43,8 +43,7 @@ jobs:
       run: mvn clean install -pl xsm -am -Dmaven.test.skip=true
 
     - name: Build escali
-      run: |
-        run: mvn clean install -pl escali -am -Dmaven.test.skip=true
+      run: mvn clean install -pl escali -am -Dmaven.test.skip=true
 
     - name: Upload escali Artifacts
       uses: actions/upload-artifact@v4
