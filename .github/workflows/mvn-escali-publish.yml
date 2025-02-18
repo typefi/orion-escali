@@ -29,6 +29,22 @@ jobs:
         distribution: 'microsoft'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: Set up Maven settings.xml
+      run: |
+        mkdir -p ~/.m2
+        cat <<EOF > ~/.m2/settings.xml
+        <settings>
+         <servers>
+           <server>
+             <id>github</id>
+             <username>${{ github.actor }}</username>
+             <password>${{ secrets.TOKEN }}</password>
+           </server>
+         </servers>
+        </settings>
+        EOF
+
     - name: 'Get Previous tag'
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@v1.3.0"
@@ -60,8 +76,9 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
 
     - name: Publish to GitHub Packages
-      run: mvn deploy -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/typefi/orion-escali
+      run: mvn deploy -DskipTests -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/typefi/orion-escali
       env:
+        USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         VERSION: '0.3.0'
 
