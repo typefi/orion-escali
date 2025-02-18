@@ -39,10 +39,12 @@ jobs:
         restore-keys: |
           maven-${{ runner.os }}-
 
+    - name: Build dependencies (xsm)
+      run: mvn clean install -pl xsm -am -Dmaven.test.skip=true
+
     - name: Build escali
       run: |
-        cd escali
-        mvn clean install -Dmaven.test.skip=true
+        run: mvn clean install -pl escali -am -Dmaven.test.skip=true
 
     - name: Upload escali Artifacts
       uses: actions/upload-artifact@v4
