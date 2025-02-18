@@ -60,7 +60,7 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
 
     - name: Publish to GitHub Packages
-      run: mvn deploy -DskipTests
+      run: mvn deploy -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/typefi/orion-escali
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         VERSION: '0.3.0'
