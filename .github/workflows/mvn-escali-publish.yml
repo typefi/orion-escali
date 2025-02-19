@@ -61,7 +61,7 @@ jobs:
         TOKEN: ${{ secrets.TOKEN }}
 
     - name: Publish to GitHub Packages
-      run: mvn deploy -pl escali,!xsm,!escali-main-package -am -s $GITHUB_WORKSPACE/settings.xml -Dmaven.test.skip=true
+      run: mvn deploy -pl escali,!xsm -am -s $GITHUB_WORKSPACE/settings.xml -Dmaven.test.skip=true
       env:
         USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
