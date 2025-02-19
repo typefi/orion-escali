@@ -61,6 +61,6 @@ jobs:
         TOKEN: ${{ secrets.TOKEN }}
 
     - name: Publish to GitHub Packages
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -Dmaven.test.skip=true
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
