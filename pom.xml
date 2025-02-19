@@ -24,6 +24,12 @@
             <url>http://www.gnu.org/licenses/gpl.txt</url>
         </license>
     </licenses>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/typefi/orion-escali</url>
+		</repository>
+	</distributionManagement>
     <developers>
         <developer>
             <name>Nico Kutscherauer</name>
