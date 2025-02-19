@@ -7,6 +7,7 @@
 	    <version>0.3.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>escali</artifactId>
+	<version>0.3.1-SNAPSHOT</version>
 	<name>Escali Schematron Processor</name>
 	<description>The Escali Schematron Processor is able to validate Schematron Schema using the Escali Stylesheets. Based on the resulting report the processor is possible to execute QuickFixes, which was defind in SQF.</description>
 	<distributionManagement>
