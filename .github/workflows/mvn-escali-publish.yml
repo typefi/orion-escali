@@ -48,6 +48,19 @@ jobs:
       env:
         GITHUB_TOKEN: "${{ secrets.TOKEN }}"
 
+    - name: Check if escali-main-package exists
+      id: check-main-package
+      run: |
+       if curl -u $GITHUB_ACTOR:$GITHUB_TOKEN -s -o /dev/null -w "%{http_code}" \
+        https://maven.pkg.github.com/typefi/orion-escali/com/schematron-quickfix/escali-main-package/0.3.0/escali-main-package-0.3.0.pom | grep -q "200"; then
+        echo "PACKAGE_EXISTS=true" >> $GITHUB_ENV
+       else
+        echo "PACKAGE_EXISTS=false" >> $GITHUB_ENV
+       fi
+      env:
+        USERNAME: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
     - name: Build dependencies (xsm)
       run: mvn clean install -pl xsm -am -Dmaven.test.skip=true
       env:
